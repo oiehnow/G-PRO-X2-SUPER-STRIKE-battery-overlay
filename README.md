@@ -1,5 +1,8 @@
 # PRO X2 Battery Overlay
 
+<img width="396" height="232" alt="image" src="https://github.com/user-attachments/assets/ea0a7be8-f67a-44c0-9c1b-331005e4bb45" />
+
+
 로지텍 **PRO X2 Superstrike**(및 기타 Logitech 무선 기기)의 배터리 잔량과 **예상 남은 사용 시간**을 작은 반투명 오버레이로 띄우는 Windows 앱입니다. 단축키로 켜고 끌 수 있고, **투명도 조절 바**가 내장되어 있습니다.
 
 ## 왜 별도 백엔드(LGSTrayEx)가 필요한가
