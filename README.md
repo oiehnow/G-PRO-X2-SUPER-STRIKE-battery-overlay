@@ -3,7 +3,9 @@
 <img width="396" height="232" alt="image" src="https://github.com/user-attachments/assets/ea0a7be8-f67a-44c0-9c1b-331005e4bb45" />
 
 
-로지텍 **PRO X2 Superstrike**(및 기타 Logitech 무선 기기)의 배터리 잔량과 **예상 남은 사용 시간**을 작은 반투명 오버레이로 띄우는 Windows 앱입니다. 단축키로 켜고 끌 수 있고, **투명도 조절 바**가 내장되어 있습니다.
+로지텍 무선 마우스의 배터리 잔량과 **예상 남은 사용 시간**을 작은 반투명 오버레이로 띄우는 Windows 앱입니다. 단축키로 켜고 끌 수 있고, **투명도 조절 바**가 내장되어 있습니다.
+
+기본 지원 모델: **PRO X2 Superstrike · G PRO X SUPERLIGHT · G PRO X SUPERLIGHT 2** (그 외 LGSTrayEx 가 인식하는 Logitech 무선 기기도 `config.json` 의 `device_name_hints` 에 키워드를 추가하면 사용 가능).
 
 ## 왜 별도 백엔드(LGSTrayEx)가 필요한가
 
@@ -41,7 +43,7 @@ python src/main.py
 |---|---|---|
 | `backend_host` / `backend_port` | LGSTrayEx HTTP 서버 주소 | `127.0.0.1` / `12321` |
 | `device_id` | 비우면 이름으로 자동 탐색 | `""` |
-| `device_name_hint` | 자동 탐색용 이름 키워드 | `PRO X 2` |
+| `device_name_hints` | 자동 탐색 이름 키워드 목록(하나라도 포함되면 매칭) | `["SUPERSTRIKE", "SUPERLIGHT", "PRO X"]` |
 | `poll_interval_seconds` | 폴링 주기 | `30` |
 | `full_life_hours` | 스펙 배터리 수명(폴백) | `75` |
 | `toggle_hotkey` | 표시/숨김 단축키 | `ctrl+alt+b` |

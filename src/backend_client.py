@@ -89,14 +89,21 @@ class BackendClient:
                     devices.append((dev_id, ""))
         return devices
 
-    def resolve_device_id(self, name_hint: str) -> str:
-        """이름 키워드로 deviceID 자동 탐색. 못 찾으면 첫 기기 사용."""
+    def resolve_device_id(self, name_hints) -> str:
+        """이름 키워드(들)로 deviceID 자동 탐색. 못 찾으면 첫 기기 사용.
+
+        name_hints 는 문자열 또는 문자열 리스트. 기기 이름에 키워드 중
+        하나라도 포함되면(대소문자/공백 무시) 매칭한다.
+        """
+        if isinstance(name_hints, str):
+            name_hints = [name_hints]
         devices = self.list_devices()
         if not devices:
             raise BackendError("LGSTrayEx 에서 인식된 기기가 없습니다.")
-        hint = name_hint.lower().replace(" ", "")
+        norm_hints = [h.lower().replace(" ", "") for h in name_hints if h]
         for dev_id, name in devices:
-            if hint and hint in name.lower().replace(" ", ""):
+            norm_name = name.lower().replace(" ", "")
+            if any(h in norm_name for h in norm_hints):
                 return dev_id
         return devices[0][0]
 

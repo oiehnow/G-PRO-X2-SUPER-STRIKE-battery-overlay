@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 
 def _config_dir() -> str:
@@ -24,9 +24,13 @@ class Settings:
     # LGSTrayEx HTTP 서버 주소/포트 (설치 후 appsettings.toml 의 [HTTPServer] 값과 맞춤)
     backend_host: str = "127.0.0.1"
     backend_port: int = 12321
-    # 비우면 마우스 이름으로 자동 탐색. 특정 기기 고정 시 deviceID 입력.
+    # 비우면 아래 키워드로 마우스 자동 탐색. 특정 기기 고정 시 deviceID 입력.
     device_id: str = ""
-    device_name_hint: str = "PRO X 2"  # 자동 탐색 시 이름 매칭 키워드
+    # 자동 탐색 시 기기 이름에 이 키워드 중 하나라도 포함되면 매칭(대소문자/공백 무시).
+    # PRO X 계열(Superstrike / Superlight / Superlight 2 등)을 폭넓게 인식.
+    device_name_hints: list[str] = field(
+        default_factory=lambda: ["SUPERSTRIKE", "SUPERLIGHT", "PRO X"]
+    )
 
     poll_interval_seconds: int = 30
     full_life_hours: float = 75.0
@@ -53,5 +57,10 @@ class Settings:
                 data = json.load(f)
         except (json.JSONDecodeError, OSError):
             return cls()
+        # 구버전 마이그레이션: device_name_hint(단수) → device_name_hints(복수)
+        if "device_name_hint" in data and "device_name_hints" not in data:
+            old = data.pop("device_name_hint")
+            if old:
+                data["device_name_hints"] = [old]
         valid = {k: v for k, v in data.items() if k in cls.__annotations__}
         return cls(**valid)

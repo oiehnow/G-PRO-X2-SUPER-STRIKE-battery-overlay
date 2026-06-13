@@ -120,7 +120,7 @@ class App:
         try:
             if not self._device_id:
                 self._device_id = self.client.resolve_device_id(
-                    self.settings.device_name_hint
+                    self.settings.device_name_hints
                 )
                 self._save_settings()
             status = self.client.get_status(self._device_id)
