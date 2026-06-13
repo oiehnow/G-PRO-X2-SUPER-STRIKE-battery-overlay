@@ -5,6 +5,8 @@ from __future__ import annotations
 from PyQt6.QtGui import QAction, QColor, QIcon, QPainter, QPixmap
 from PyQt6.QtWidgets import QMenu, QSystemTrayIcon
 
+from settings import APP_VERSION
+
 
 def _make_icon() -> QIcon:
     """간단한 배터리 모양 아이콘을 코드로 그려 둔다(외부 파일 불필요)."""
@@ -22,7 +24,7 @@ def _make_icon() -> QIcon:
 
 def build_tray(app, overlay, on_quit) -> QSystemTrayIcon:
     tray = QSystemTrayIcon(_make_icon(), parent=app)
-    tray.setToolTip("PRO X2 배터리 오버레이")
+    tray.setToolTip(f"배터리 오버레이 v{APP_VERSION}")
 
     menu = QMenu()
 

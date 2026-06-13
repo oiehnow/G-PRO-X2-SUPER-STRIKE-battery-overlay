@@ -7,6 +7,8 @@ import os
 import sys
 from dataclasses import asdict, dataclass, field
 
+APP_VERSION = "1.1.0"
+
 
 def _config_dir() -> str:
     """config.json 위치. PyInstaller 로 묶인 exe 면 exe 옆, 아니면 프로젝트 루트."""
