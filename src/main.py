@@ -53,7 +53,7 @@ class App:
         self._estimators: dict[str, BatteryEstimator] = {}
         self.client = BackendClient(self.settings.backend_host, self.settings.backend_port)
 
-        self.overlay = OverlayWindow(self.settings, self._save_settings)
+        self.overlay = OverlayWindow(self.settings, self._save_settings, self.quit)
         self.overlay.show()
         self.tray = build_tray(self.qt, self.overlay, self.quit)
         self._register_hotkey()

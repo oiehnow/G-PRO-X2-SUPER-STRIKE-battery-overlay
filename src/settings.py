@@ -7,7 +7,7 @@ import os
 import sys
 from dataclasses import asdict, dataclass, field
 
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.2.0"
 
 
 def _config_dir() -> str:
