@@ -89,23 +89,19 @@ class BackendClient:
                     devices.append((dev_id, ""))
         return devices
 
-    def resolve_device_id(self, name_hints) -> str:
-        """이름 키워드(들)로 deviceID 자동 탐색. 못 찾으면 첫 기기 사용.
+    def get_all_statuses(self) -> list[BatteryStatus]:
+        """감지된 모든 기기의 배터리 상태. 개별 조회 실패는 건너뛴다.
 
-        name_hints 는 문자열 또는 문자열 리스트. 기기 이름에 키워드 중
-        하나라도 포함되면(대소문자/공백 무시) 매칭한다.
+        브랜드/종류(마우스·키보드·헤드셋)와 무관하게 LGSTrayEx 가 인식한
+        모든 기기를 반환한다. 필터링하지 않는다.
         """
-        if isinstance(name_hints, str):
-            name_hints = [name_hints]
-        devices = self.list_devices()
-        if not devices:
-            raise BackendError("LGSTrayEx 에서 인식된 기기가 없습니다.")
-        norm_hints = [h.lower().replace(" ", "") for h in name_hints if h]
-        for dev_id, name in devices:
-            norm_name = name.lower().replace(" ", "")
-            if any(h in norm_name for h in norm_hints):
-                return dev_id
-        return devices[0][0]
+        statuses: list[BatteryStatus] = []
+        for dev_id, _name in self.list_devices():
+            try:
+                statuses.append(self.get_status(dev_id))
+            except BackendError:
+                continue  # 일부 기기 조회 실패해도 나머지는 표시
+        return statuses
 
     def get_status(self, device_id: str) -> BatteryStatus:
         root = self._get_xml(f"/device/{device_id}")

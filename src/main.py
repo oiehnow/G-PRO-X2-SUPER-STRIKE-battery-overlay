@@ -49,9 +49,9 @@ class App:
         self.qt.setQuitOnLastWindowClosed(False)
 
         self.settings = Settings.load()
-        self.estimator = BatteryEstimator(full_life_hours=self.settings.full_life_hours)
+        # 기기(device_id)별 추정기. 처음 보는 기기는 그때 생성.
+        self._estimators: dict[str, BatteryEstimator] = {}
         self.client = BackendClient(self.settings.backend_host, self.settings.backend_port)
-        self._device_id = self.settings.device_id
 
         self.overlay = OverlayWindow(self.settings, self._save_settings)
         self.overlay.show()
@@ -71,7 +71,7 @@ class App:
             self._start_polling()
             return
 
-        self.overlay.update_status(0, "", False, setup="백엔드 준비 중…")
+        self.overlay.update_devices([], setup="백엔드 준비 중…")
         self._dialog = QProgressDialog("백엔드(LGSTrayEx) 준비 중…", None, 0, 100)
         self._dialog.setWindowTitle("PRO X2 배터리 오버레이 — 첫 실행 설정")
         self._dialog.setCancelButton(None)
@@ -94,7 +94,7 @@ class App:
         if ok:
             self._start_polling()
         else:
-            self.overlay.update_status(0, "", False, error=True)
+            self.overlay.update_devices([], error=True)
             # 백엔드가 늦게 떠도 잡을 수 있게 폴링은 돌린다
             self._start_polling()
 
@@ -105,8 +105,14 @@ class App:
 
     # ---- 설정 저장 ----
     def _save_settings(self):
-        self.settings.device_id = self._device_id
         self.settings.save()
+
+    def _estimator_for(self, device_id: str) -> BatteryEstimator:
+        est = self._estimators.get(device_id)
+        if est is None:
+            est = BatteryEstimator(full_life_hours=self.settings.full_life_hours)
+            self._estimators[device_id] = est
+        return est
 
     def _register_hotkey(self):
         if keyboard is None:
@@ -118,22 +124,26 @@ class App:
 
     def poll(self):
         try:
-            if not self._device_id:
-                self._device_id = self.client.resolve_device_id(
-                    self.settings.device_name_hints
-                )
-                self._save_settings()
-            status = self.client.get_status(self._device_id)
+            statuses = self.client.get_all_statuses()
         except BackendError:
-            self.overlay.update_status(0, "", False, error=True)
+            self.overlay.update_devices([], error=True)
             return
 
-        self.estimator.add_sample(time.monotonic(), status.percent)
-        hours = self.estimator.hours_remaining(status.percent)
-        self.overlay.update_status(
-            status.percent, format_hours(hours), status.is_online
-        )
-        if not self._got_first:
+        now = time.monotonic()
+        online = [s for s in statuses if s.is_online]  # 오프라인 기기는 숨김
+        rows = []
+        for s in online:
+            est = self._estimator_for(s.device_id)
+            est.add_sample(now, s.percent)
+            hours = est.hours_remaining(s.percent)
+            rows.append({
+                "name": s.name,
+                "percent": s.percent,
+                "hours_text": format_hours(hours),
+            })
+        self.overlay.update_devices(rows)
+
+        if not self._got_first and rows:
             # 첫 성공 → 정상 폴링 주기로 전환
             self._got_first = True
             self.timer.start(max(5, self.settings.poll_interval_seconds) * 1000)

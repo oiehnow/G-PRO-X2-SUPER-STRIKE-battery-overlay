@@ -21,17 +21,16 @@ class OverlayWindow(QWidget):
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(14, 10, 14, 10)
-        layout.setSpacing(4)
+        self._layout = QVBoxLayout(self)
+        self._layout.setContentsMargins(14, 10, 14, 10)
+        self._layout.setSpacing(4)
 
-        self.battery_label = QLabel("🔋 --%")
-        self.battery_label.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
-        self.battery_label.setStyleSheet("color: white;")
-
-        self.time_label = QLabel("남은시간 --")
-        self.time_label.setFont(QFont("Segoe UI", 9))
-        self.time_label.setStyleSheet("color: #cfd3dc;")
+        # 기기 행들을 담는 컨테이너(매 갱신마다 다시 빌드)
+        self._rows_container = QWidget()
+        self._rows_layout = QVBoxLayout(self._rows_container)
+        self._rows_layout.setContentsMargins(0, 0, 0, 0)
+        self._rows_layout.setSpacing(8)
+        self._build_message("🔋 --", "기기 검색 중…")
 
         # 투명도 조절 바
         self.opacity_slider = QSlider(Qt.Orientation.Horizontal)
@@ -48,9 +47,8 @@ class OverlayWindow(QWidget):
             """
         )
 
-        layout.addWidget(self.battery_label)
-        layout.addWidget(self.time_label)
-        layout.addWidget(self.opacity_slider)
+        self._layout.addWidget(self._rows_container)
+        self._layout.addWidget(self.opacity_slider)
 
         self.setWindowOpacity(self._settings.opacity)
         self.move(self._settings.pos_x, self._settings.pos_y)
@@ -64,20 +62,55 @@ class OverlayWindow(QWidget):
         path.addRoundedRect(self.rect().toRectF(), 12, 12)
         painter.fillPath(path, QColor(20, 22, 28, 220))
 
+    # ---- 행 빌드 ----
+    def _clear_rows(self):
+        while self._rows_layout.count():
+            item = self._rows_layout.takeAt(0)
+            w = item.widget()
+            if w is not None:
+                w.deleteLater()
+
+    def _add_device_row(self, name: str, percent: float, hours_text: str):
+        title = QLabel(f"🔋 {name}  {percent:.0f}%")
+        title.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+        title.setStyleSheet("color: white;")
+
+        sub = QLabel(f"남은시간 {hours_text}")
+        sub.setFont(QFont("Segoe UI", 9))
+        sub.setStyleSheet("color: #cfd3dc;")
+
+        row = QWidget()
+        box = QVBoxLayout(row)
+        box.setContentsMargins(0, 0, 0, 0)
+        box.setSpacing(2)
+        box.addWidget(title)
+        box.addWidget(sub)
+        self._rows_layout.addWidget(row)
+
+    def _build_message(self, title_text: str, sub_text: str):
+        self._clear_rows()
+        title = QLabel(title_text)
+        title.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+        title.setStyleSheet("color: white;")
+        sub = QLabel(sub_text)
+        sub.setFont(QFont("Segoe UI", 9))
+        sub.setStyleSheet("color: #cfd3dc;")
+        self._rows_layout.addWidget(title)
+        self._rows_layout.addWidget(sub)
+
     # ---- 상태 갱신 ----
-    def update_status(self, percent, hours_text, is_online, error=None, setup=None):
+    def update_devices(self, rows, error=None, setup=None):
+        """rows: [{name, percent, hours_text}, ...] (온라인 기기만)."""
         if setup:
-            self.battery_label.setText("⏳ 준비 중")
-            self.time_label.setText(setup)
-            return
-        if error:
-            self.battery_label.setText("⚠ 백엔드 미연결")
-            self.time_label.setText("LGSTrayEx 실행 확인")
-            return
-        icon = "🔋" if is_online else "💤"
-        self.battery_label.setText(f"{icon} {percent:.0f}%")
-        suffix = "" if is_online else " (오프라인)"
-        self.time_label.setText(f"남은시간 {hours_text}{suffix}")
+            self._build_message("⏳ 준비 중", setup)
+        elif error:
+            self._build_message("⚠ 백엔드 미연결", "LGSTrayEx 실행 확인")
+        elif not rows:
+            self._build_message("🔌 기기 없음", "연결된 기기를 켜 주세요")
+        else:
+            self._clear_rows()
+            for r in rows:
+                self._add_device_row(r["name"], r["percent"], r["hours_text"])
         self.adjustSize()
 
     def _on_opacity_changed(self, value: int):

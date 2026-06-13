@@ -24,10 +24,9 @@ class Settings:
     # LGSTrayEx HTTP 서버 주소/포트 (설치 후 appsettings.toml 의 [HTTPServer] 값과 맞춤)
     backend_host: str = "127.0.0.1"
     backend_port: int = 12321
-    # 비우면 아래 키워드로 마우스 자동 탐색. 특정 기기 고정 시 deviceID 입력.
+    # (미사용) 과거 단일 기기 고정/필터링용. 현재는 감지된 모든 기기를 표시한다.
+    # 구버전 config.json 호환을 위해 필드만 남겨둔다.
     device_id: str = ""
-    # 자동 탐색 시 기기 이름에 이 키워드 중 하나라도 포함되면 매칭(대소문자/공백 무시).
-    # PRO X 계열(Superstrike / Superlight / Superlight 2 등)을 폭넓게 인식.
     device_name_hints: list[str] = field(
         default_factory=lambda: ["SUPERSTRIKE", "SUPERLIGHT", "PRO X"]
     )
