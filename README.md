@@ -11,25 +11,25 @@ PRO X2 라인은 표준 HID++ 가 아니라 신형 **Centurion 프로토콜**을
 
 > "남은 시간"은 마우스가 알려주지 않습니다. `(시각, 배터리%)` 샘플을 누적해 방전율(%/h)을 구하고 외삽합니다. 표본이 쌓이기 전에는 스펙 수명(기본 75h)을 기준으로 표시합니다.
 
-## 사전 준비: LGSTrayEx 설치/설정
+## 설치 — 원클릭 (일반 사용자)
 
-1. [LGSTrayEx 릴리스](https://github.com/strain08/LGSTrayEx/releases)에서 standalone 빌드(또는 MSI) 다운로드 후 실행.
-2. `appsettings.toml` 의 `[HTTPServer]` 섹션을 다음과 같이 설정:
-   ```toml
-   [HTTPServer]
-   enabled = true
-   addr = "127.0.0.1"
-   port = 12321
-   useIpv6 = false
-   ```
-3. LGSTrayEx 를 (재)실행하고 브라우저에서 `http://127.0.0.1:12321/` 가 기기 목록을 보여주는지 확인.
+1. [Releases](https://github.com/oiehnow/G-PRO-X2-SUPER-STRIKE-battery-overlay/releases) 에서 **`ProX2BatteryOverlay.exe`** 를 받습니다.
+2. **더블클릭.** 끝입니다.
 
-## 실행
+처음 실행하면 앱이 백엔드(LGSTrayEx)가 없는 것을 감지하고 **자동으로 내려받아 설정·실행**합니다(약 1분, 진행바 표시). 이후부터는 즉시 배터리가 표시됩니다. `appsettings.toml` 을 직접 건드릴 필요가 없습니다.
+
+> 백엔드(LGSTrayEx)는 GPL-3.0 별도 프로젝트라 동봉하지 않고, 첫 실행 시 [공식 릴리스](https://github.com/strain08/LGSTrayEx/releases)에서 `%LOCALAPPDATA%\ProX2BatteryOverlay\LGSTrayEx` 로 내려받습니다.
+
+## 실행 — 소스에서 (개발자)
 
 ```powershell
 pip install -r requirements.txt
 python src/main.py
 ```
+
+소스 실행도 동일하게 첫 실행 시 백엔드를 자동 준비합니다.
+
+## 사용법
 
 - 기본 단축키 **Ctrl+Alt+B** 로 오버레이 표시/숨김.
 - 트레이 아이콘 좌클릭으로도 토글, 우클릭으로 메뉴(표시/숨김, 종료).

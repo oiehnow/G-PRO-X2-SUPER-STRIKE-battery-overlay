@@ -65,7 +65,11 @@ class OverlayWindow(QWidget):
         painter.fillPath(path, QColor(20, 22, 28, 220))
 
     # ---- 상태 갱신 ----
-    def update_status(self, percent, hours_text, is_online, error=None):
+    def update_status(self, percent, hours_text, is_online, error=None, setup=None):
+        if setup:
+            self.battery_label.setText("⏳ 준비 중")
+            self.time_label.setText(setup)
+            return
         if error:
             self.battery_label.setText("⚠ 백엔드 미연결")
             self.time_label.setText("LGSTrayEx 실행 확인")

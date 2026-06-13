@@ -4,11 +4,18 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from dataclasses import asdict, dataclass
 
 
-# config.json 은 exe/스크립트와 같은 폴더 기준으로 둔다.
-CONFIG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+def _config_dir() -> str:
+    """config.json 위치. PyInstaller 로 묶인 exe 면 exe 옆, 아니면 프로젝트 루트."""
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+CONFIG_DIR = _config_dir()
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
 
 
