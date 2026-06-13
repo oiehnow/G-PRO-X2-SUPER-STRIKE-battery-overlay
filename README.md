@@ -51,7 +51,8 @@ python src/main.py
 
 ```powershell
 pip install pyinstaller
-pyinstaller --noconsole --onefile --name "ProX2BatteryOverlay" src/main.py
+pyinstaller --noconsole --onefile --name "ProX2BatteryOverlay" --icon icon.ico ^
+  --paths src --hidden-import keyboard --collect-submodules requests src/main.py
 ```
 
 ## 알려진 제약
