@@ -49,9 +49,7 @@ class OverlayWindow(QWidget):
         bar.setSpacing(4)
         bar.addStretch(1)
         self._min_btn = self._make_button("–", "최소화", self.toggle_minimize)
-        self._close_btn = self._make_button("×", "종료", self._on_quit)
         bar.addWidget(self._min_btn)
-        bar.addWidget(self._close_btn)
 
         # 기기 행들을 담는 컨테이너(매 갱신마다 다시 빌드)
         self._rows_container = QWidget()
