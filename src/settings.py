@@ -7,7 +7,7 @@ import os
 import sys
 from dataclasses import asdict, dataclass, field
 
-APP_VERSION = "1.2.0"
+APP_VERSION = "1.3.0"
 
 
 def _config_dir() -> str:
@@ -34,6 +34,7 @@ class Settings:
     )
 
     poll_interval_seconds: int = 30
+    # (미사용) 과거 남은시간 추정용. 구버전 config.json 호환을 위해 필드만 남겨둔다.
     full_life_hours: float = 75.0
 
     toggle_hotkey: str = "ctrl+alt+b"

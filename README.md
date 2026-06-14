@@ -9,7 +9,7 @@
 
 ## 왜 별도 백엔드(LGSTrayEx)가 필요한가
 
-PRO X2 라인은 표준 HID++ 가 아니라 신형 **Centurion 프로토콜**을 사용해 마우스와 직접 통신하기가 까다롭습니다. 그래서 이미 이 프로토콜을 구현한 오픈소스 트레이앱 **[LGSTrayEx](https://github.com/strain08/LGSTrayEx)** 가 노출하는 **로컬 HTTP/XML 엔드포인트**를 폴링합니다. 이 앱은 "예쁜 오버레이 + 토글 + 남은시간 계산"만 담당합니다.
+PRO X2 라인은 표준 HID++ 가 아니라 신형 **Centurion 프로토콜**을 사용해 마우스와 직접 통신하기가 까다롭습니다. 그래서 이미 이 프로토콜을 구현한 오픈소스 트레이앱 **[LGSTrayEx](https://github.com/strain08/LGSTrayEx)** 가 노출하는 **로컬 HTTP/XML 엔드포인트**를 폴링합니다. 이 앱은 "예쁜 오버레이 + 토글 + 배터리 % 표시"만 담당합니다.
 
 > "남은 시간"은 마우스가 알려주지 않습니다. `(시각, 배터리%)` 샘플을 누적해 방전율(%/h)을 구하고 외삽합니다. 표본이 쌓이기 전에는 스펙 수명(기본 75h)을 기준으로 표시합니다.
 
@@ -45,7 +45,6 @@ python src/main.py
 | `device_id` | 비우면 이름으로 자동 탐색 | `""` |
 | `device_name_hints` | 자동 탐색 이름 키워드 목록(하나라도 포함되면 매칭) | `["SUPERSTRIKE", "SUPERLIGHT", "PRO X"]` |
 | `poll_interval_seconds` | 폴링 주기 | `30` |
-| `full_life_hours` | 스펙 배터리 수명(폴백) | `75` |
 | `toggle_hotkey` | 표시/숨김 단축키 | `ctrl+alt+b` |
 | `opacity` | 창 불투명도(0.1~1.0) | `0.85` |
 

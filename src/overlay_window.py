@@ -1,7 +1,7 @@
 """프레임리스 / 반투명 / 항상 위 오버레이 창.
 
 상단 우측에 최소화·종료 버튼, 하단에 투명도 조절 바를 둔다.
-최소화 모드에서는 모델명·남은시간·슬라이더를 숨기고 배터리 잔량 %만 보여준다.
+최소화 모드에서는 모델명·슬라이더를 숨기고 배터리 잔량 %만 보여준다.
 """
 
 from __future__ import annotations
@@ -117,7 +117,7 @@ class OverlayWindow(QWidget):
             if w is not None:
                 w.deleteLater()
 
-    def _add_device_row(self, name: str, percent: float, hours_text: str):
+    def _add_device_row(self, name: str, percent: float):
         row = QWidget()
         box = QVBoxLayout(row)
         box.setContentsMargins(0, 0, 0, 0)
@@ -136,13 +136,6 @@ class OverlayWindow(QWidget):
         pct.setStyleSheet("color: white;")
         box.addWidget(pct)
 
-        if not self._minimized:
-            # 아랫줄: 남은시간 (작게)
-            sub = QLabel(f"남은시간 {hours_text}")
-            sub.setFont(QFont("Segoe UI", 9))
-            sub.setStyleSheet("color: #cfd3dc;")
-            box.addWidget(sub)
-
         self._rows_layout.addWidget(row)
 
     def _build_message(self, title_text: str, sub_text: str):
@@ -159,7 +152,7 @@ class OverlayWindow(QWidget):
 
     # ---- 상태 갱신 ----
     def update_devices(self, rows, error=None, setup=None):
-        """rows: [{name, percent, hours_text}, ...] (온라인 기기만)."""
+        """rows: [{name, percent}, ...] (온라인 기기만)."""
         self._last_rows = rows
         self._last_error = error
         self._last_setup = setup
@@ -175,7 +168,7 @@ class OverlayWindow(QWidget):
         else:
             self._clear_rows()
             for r in self._last_rows:
-                self._add_device_row(r["name"], r["percent"], r["hours_text"])
+                self._add_device_row(r["name"], r["percent"])
         # 최소화 시 슬라이더 숨김
         self.opacity_slider.setVisible(not self._minimized)
         self.adjustSize()
